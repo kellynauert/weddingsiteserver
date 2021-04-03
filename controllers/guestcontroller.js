@@ -102,67 +102,11 @@ router.put('/:id', function (req, res) {
     })
     .catch((err) => res.status(500).json({ error: err }));
 });
-
-router.get('/:id', function (req, res) {
-  Guest.findOne({
-    where: { id: req.params.id },
-    include: 'group',
-  })
-    .then((guest) => {
-      const guestEntry = {
-        firstName: guest.firstName,
-        lastName: guest.lastName,
-        attending: guest.attending,
-        over21: guest.over21,
-        drinking: guest.drinking,
-        plusOneId: guest.plusOneId,
-        diet: guest.diet,
-      };
-      return res.status(200).json(guestEntry);
-    })
-    .catch((err) => res.status(500).json({ error: err }));
-});
-module.exports = router;
-
-router.get('/master/:id', validateSession, function (req, res) {
-  Guest.findOne({
-    where: { id: req.params.id },
-    include: 'group',
-  })
-    .then((guest) => res.status(200).json(guest))
-    .catch((err) => res.status(500).json({ error: err }));
-});
-module.exports = router;
-
-router.get('/master/', function (req, res) {
+router.get('/master/', validateSession, function (req, res) {
   Guest.findAll()
     .then((guest) => res.status(200).json(guest))
     .catch((err) => res.status(500).json({ error: err }));
 });
-module.exports = router;
-
-router.get('/', function (req, res) {
-  Guest.findAll()
-    .then((guests) => {
-      const guestsArr = [];
-      guests.map((guest) => {
-        const guestEntry = {
-          id: guest.id,
-          firstName: guest.firstName,
-          lastName: guest.lastName,
-          attending: guest.attending,
-          over21: guest.over21,
-          drinking: guest.drinking,
-          plusOneId: guest.plusOneId,
-          diet: guest.diet,
-        };
-        guestsArr.push(guestEntry);
-      });
-      return res.status(200).json(guestsArr);
-    })
-    .catch((err) => res.status(500).json({ error: err }));
-});
-module.exports = router;
 
 router.get('/group/:groupId', function (req, res) {
   const query = {
@@ -186,6 +130,73 @@ router.get('/group/:groupId', function (req, res) {
       });
       return res.status(200).json(guestsArr);
     })
+    .catch((err) => res.status(500).json({ error: err }));
+});
+
+router.get('/:id', function (req, res) {
+  Guest.findOne({
+    where: { id: req.params.id },
+    include: 'group',
+  })
+    .then((guest) => {
+      const guestEntry = {
+        firstName: guest.firstName,
+        lastName: guest.lastName,
+        attending: guest.attending,
+        over21: guest.over21,
+        drinking: guest.drinking,
+        plusOneId: guest.plusOneId,
+        diet: guest.diet,
+      };
+      return res.status(200).json(guestEntry);
+    })
+    .catch((err) => res.status(500).json({ error: err }));
+});
+
+router.get('/master/:id', validateSession, function (req, res) {
+  Guest.findOne({
+    where: { id: req.params.id },
+    include: 'group',
+  })
+    .then((guest) => res.status(200).json(guest))
+    .catch((err) => res.status(500).json({ error: err }));
+});
+
+router.get('/', function (req, res) {
+  Guest.findAll()
+    .then((guests) => {
+      const guestsArr = [];
+      guests.map((guest) => {
+        const guestEntry = {
+          id: guest.id,
+          firstName: guest.firstName,
+          lastName: guest.lastName,
+          attending: guest.attending,
+          over21: guest.over21,
+          drinking: guest.drinking,
+          plusOneId: guest.plusOneId,
+          diet: guest.diet,
+        };
+        guestsArr.push(guestEntry);
+      });
+      return res.status(200).json(guestsArr);
+    })
+    .catch((err) => res.status(500).json({ error: err }));
+});
+
+router.delete('/master/:id', validateSession, function (req, res) {
+  Guest.destroy({
+    where: { id: req.params.id },
+  })
+    .then((guest) => res.status(200).json(guest))
+    .catch((err) => res.status(500).json({ error: err }));
+});
+
+router.delete('/:id', function (req, res) {
+  Guest.destroy({
+    where: { id: req.params.id, plusOneId: !null },
+  })
+    .then((guest) => res.status(200).json(guest))
     .catch((err) => res.status(500).json({ error: err }));
 });
 module.exports = router;

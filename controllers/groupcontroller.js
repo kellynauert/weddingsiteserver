@@ -34,7 +34,7 @@ router.put('/:id', function (req, res) {
 router.get('/:id', function (req, res) {
   const query = {
     where: { id: req.params.id },
-    include: ['guest'],
+    include: 'guests',
   };
   Group.findOne(query)
     .then((group) => res.status(200).json(group))
@@ -44,7 +44,7 @@ module.exports = router;
 
 router.get('/', function (req, res) {
   const query = {
-    include: ['guest'],
+    include: 'guests',
   };
   Group.findAll(query)
     .then((group) => res.status(200).json(group))
