@@ -1,18 +1,18 @@
 const { DataTypes } = require("sequelize");
 const db = require("../db");
-const BabyInfo = db.define("babyinfo", {
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  sex: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
 
-  weight: {
+const group = db.define("group", {
+  groupName: {
     type: DataTypes.STRING,
-    allowNull: false,
+    allowNull: true,
   },
+  address: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  phone: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },  
 });
-module.exports = BabyInfo;
+module.exports = group;

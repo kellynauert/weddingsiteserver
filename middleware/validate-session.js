@@ -28,3 +28,7 @@ const validateSession = (req, res, next) => {
   }
 };
 module.exports = validateSession;
+
+const valSess2 = (req, res, authCallback, unAuthCallback) => {
+  
+}
