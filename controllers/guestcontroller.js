@@ -39,23 +39,9 @@ router.post('/master/', validateSession, function (req, res) {
   }
 });
 
-router.post('/', function (req, res) {
-  const guestEntry = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    groupId: req.body.groupId,
-    attending: true,
-    over21: req.body.over21,
-    drinking: req.body.drinking,
-    plusOneId: req.body.plusOneId,
-    plusOneAllowed: false,
-    diet: req.body.diet,
-  };
-
-  Guest.create(guestEntry)
-    .then((guest) => {
-      res.status(200).json(guest);
-    })
+router.get('/master/', validateSession, function (req, res) {
+  Guest.findAll()
+    .then((guest) => res.status(200).json(guest))
     .catch((err) => res.status(500).json({ error: err }));
 });
 
@@ -82,83 +68,40 @@ router.put('/master/:id', validateSession, function (req, res) {
     .catch((err) => res.status(500).json({ error: err }));
 });
 
-router.put('/:id', function (req, res) {
-  const query = {
-    where: { id: req.params.id },
-  };
-  const guestEntry = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    attending: req.body.attending,
-    over21: req.body.over21,
-    drinking: req.body.drinking,
-    plusOneId: req.body.plusOneId,
-    diet: req.body.diet,
-  };
-
-  Guest.update(guestEntry, query)
-    .then((guest) => {
-      res.status(200).json(guest);
-    })
-    .catch((err) => res.status(500).json({ error: err }));
-});
-router.get('/master/', validateSession, function (req, res) {
-  Guest.findAll()
-    .then((guest) => res.status(200).json(guest))
-    .catch((err) => res.status(500).json({ error: err }));
-});
-
-router.get('/group/:groupId', function (req, res) {
-  const query = {
-    where: { groupId: req.params.groupId },
-  };
-  Guest.findAll(query)
-    .then((guests) => {
-      const guestsArr = [];
-      guests.map((guest) => {
-        const guestEntry = {
-          id: guest.id,
-          firstName: guest.firstName,
-          lastName: guest.lastName,
-          attending: guest.attending,
-          over21: guest.over21,
-          drinking: guest.drinking,
-          plusOneId: guest.plusOneId,
-          diet: guest.diet,
-        };
-        guestsArr.push(guestEntry);
-      });
-      return res.status(200).json(guestsArr);
-    })
-    .catch((err) => res.status(500).json({ error: err }));
-});
-
-router.get('/:id', function (req, res) {
-  Guest.findOne({
-    where: { id: req.params.id },
-    include: 'group',
-  })
-    .then((guest) => {
-      const guestEntry = {
-        firstName: guest.firstName,
-        lastName: guest.lastName,
-        attending: guest.attending,
-        over21: guest.over21,
-        drinking: guest.drinking,
-        plusOneId: guest.plusOneId,
-        diet: guest.diet,
-      };
-      return res.status(200).json(guestEntry);
-    })
-    .catch((err) => res.status(500).json({ error: err }));
-});
-
 router.get('/master/:id', validateSession, function (req, res) {
   Guest.findOne({
     where: { id: req.params.id },
     include: 'group',
   })
     .then((guest) => res.status(200).json(guest))
+    .catch((err) => res.status(500).json({ error: err }));
+});
+
+router.delete('/master/:id', validateSession, function (req, res) {
+  Guest.destroy({
+    where: { id: req.params.id },
+  })
+    .then((guest) => res.status(200).json(guest))
+    .catch((err) => res.status(500).json({ error: err }));
+});
+
+router.post('/', function (req, res) {
+  const guestEntry = {
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    groupId: req.body.groupId,
+    attending: true,
+    over21: req.body.over21,
+    drinking: req.body.drinking,
+    plusOneId: req.body.plusOneId,
+    plusOneAllowed: false,
+    diet: req.body.diet,
+  };
+
+  Guest.create(guestEntry)
+    .then((guest) => {
+      res.status(200).json(guest);
+    })
     .catch((err) => res.status(500).json({ error: err }));
 });
 
@@ -184,19 +127,64 @@ router.get('/', function (req, res) {
     .catch((err) => res.status(500).json({ error: err }));
 });
 
-router.delete('/master/:id', validateSession, function (req, res) {
-  Guest.destroy({
+router.put('/:id', function (req, res) {
+  const query = {
     where: { id: req.params.id },
+  };
+  const guestEntry = {
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    attending: req.body.attending,
+    over21: req.body.over21,
+    drinking: req.body.drinking,
+    plusOneId: req.body.plusOneId,
+    diet: req.body.diet,
+  };
+
+  Guest.update(guestEntry, query)
+    .then((guest) => {
+      res.status(200).json(guest);
+    })
+    .catch((err) => res.status(500).json({ error: err }));
+});
+
+router.get('/:id', function (req, res) {
+  Guest.findOne({
+    where: { id: req.params.id },
+    include: 'group',
   })
-    .then((guest) => res.status(200).json(guest))
+    .then((guest) => {
+      const guestEntry = {
+        firstName: guest.firstName,
+        lastName: guest.lastName,
+        attending: guest.attending,
+        over21: guest.over21,
+        drinking: guest.drinking,
+        plusOneId: guest.plusOneId,
+        diet: guest.diet,
+      };
+      return res.status(200).json(guestEntry);
+    })
     .catch((err) => res.status(500).json({ error: err }));
 });
 
 router.delete('/:id', function (req, res) {
-  Guest.destroy({
-    where: { id: req.params.id, plusOneId: !null },
+  Guest.findOne({
+    where: { id: req.params.id },
   })
-    .then((guest) => res.status(200).json(guest))
+    .then((guest) => {
+      if (guest.plusOneId)
+        Guest.destroy({
+          where: { id: guest.id },
+        })
+          .then((guest) => res.status(200).json(guest))
+          .catch((err) => res.status(500).json({ error: err }));
+      else
+        res
+          .status(500)
+          .json({ error: 'Must be logged in to delete a non-plus one' });
+    })
     .catch((err) => res.status(500).json({ error: err }));
 });
+
 module.exports = router;
