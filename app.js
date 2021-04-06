@@ -20,9 +20,9 @@ app.use('/group', controllers.Group);
 db.authenticate()
   .then(() =>
     db
-      .sync
+      .sync(
       // { force: true }
-      ()
+      )
   )
   .then(() =>
     app.listen(3000, () => {

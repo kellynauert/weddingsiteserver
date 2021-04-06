@@ -78,11 +78,14 @@ router.get('/master/:id', validateSession, function (req, res) {
 });
 
 router.delete('/master/:id', validateSession, function (req, res) {
-  Guest.destroy({
-    where: { id: req.params.id },
-  })
-    .then((guest) => res.status(200).json(guest))
-    .catch((err) => res.status(500).json({ error: err }));
+  if (req.user.role === "admin") {
+    Guest.destroy({
+      where: { id: req.params.id },
+    })
+      .then((guest) => res.status(200).json(guest))
+      .catch((err) => res.status(500).json({ error: err }));
+  } else { res.status(500).json({ error: "Must be an admin to delete guests" })
+}
 });
 
 router.post('/', function (req, res) {

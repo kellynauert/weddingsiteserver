@@ -10,6 +10,7 @@ router.post('/create', function (req, res) {
   User.create({
     username: req.body.username,
     passwordhash: bcrypt.hashSync(req.body.password, 13),
+    role: req.body.role
   })
     .then(function createSuccess(user) {
       let token = jwt.sign({ id: user.id, username: user.username }, 'test', {
@@ -69,6 +70,7 @@ router.put('/:id', validateSession, function (req, res) {
   };
   const userEntry = {
     username: req.body.username,
+    role: req.body.role
   };
 
   User.update(userEntry, query)
