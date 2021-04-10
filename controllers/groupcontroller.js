@@ -16,6 +16,21 @@ router.post('/', validateSession, function (req, res) {
     })
     .catch((err) => res.status(500).json({ error: err }));
 });
+router.post('/many', validateSession, function (req, res) {
+  groupEntry: [
+    {
+      groupName: req.body.groupName,
+      address: req.body.address,
+      phone: req.body.phone,
+    },
+  ];
+
+  Group.bulkCreate(req.body.groupEntry)
+    .then((group) => {
+      res.status(200).json(group);
+    })
+    .catch((err) => res.status(500).json({ error: err }));
+});
 router.put('/:id', function (req, res) {
   const groupEntry = {
     id: req.params.id,

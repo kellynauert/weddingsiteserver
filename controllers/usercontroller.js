@@ -6,19 +6,24 @@ const validateSession = require('../middleware/validate-session');
 const { validate } = require('../db');
 
 const router = Router();
+
 router.post('/create', function (req, res) {
   User.create({
     username: req.body.username,
     passwordhash: bcrypt.hashSync(req.body.password, 13),
-    role: req.body.role
+    role: req.body.role,
   })
     .then(function createSuccess(user) {
-      let token = jwt.sign({ id: user.id, username: user.username }, 'test', {
-        expiresIn: 60 * 60 * 24,
-      });
+      let token = jwt.sign(
+        { id: user.id, username: user.username },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: 60 * 60 * 24,
+        }
+      );
       res.json({
         user: user,
-        message: 'User Successfully Created',
+        message: 'User Created',
         sessionToken: token,
       });
     })
@@ -42,7 +47,7 @@ router.post('/login', function (req, res) {
             if (matches) {
               let token = jwt.sign(
                 { id: user.id, username: user.username },
-                'test',
+                process.env.JWT_SECRET,
                 {
                   expiresIn: 60 * 60 * 24,
                 }
@@ -70,7 +75,7 @@ router.put('/:id', validateSession, function (req, res) {
   };
   const userEntry = {
     username: req.body.username,
-    role: req.body.role
+    role: req.body.role,
   };
 
   User.update(userEntry, query)

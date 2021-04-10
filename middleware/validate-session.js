@@ -1,13 +1,13 @@
-const jwt = require("jsonwebtoken");
-const { User } = require("../models");
+const jwt = require('jsonwebtoken');
+const { User } = require('../models');
 
 const validateSession = (req, res, next) => {
   const token = req.headers.authorization;
 
   if (!token) {
-    return res.status(403).send({ auth: false, message: "No Token Provided" });
+    return res.status(403).send({ auth: false, message: 'No Token Provided' });
   } else {
-    jwt.verify(token, "test", (err, decodeToken) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decodeToken) => {
       if (!err && decodeToken) {
         User.findOne({
           where: {
@@ -22,13 +22,11 @@ const validateSession = (req, res, next) => {
           .catch((err) => next(err));
       } else {
         req.errors = err;
-        return res.status(500).send("Not Authorized");
+        return res.status(500).send('Not Authorized');
       }
     });
   }
 };
 module.exports = validateSession;
 
-const valSess2 = (req, res, authCallback, unAuthCallback) => {
-  
-}
+const valSess2 = (req, res, authCallback, unAuthCallback) => {};

@@ -38,9 +38,30 @@ router.post('/master/', validateSession, function (req, res) {
       .catch((err) => res.status(500).json({ error: err }));
   }
 });
+router.post('/master/many/', validateSession, function (req, res) {
+  guestEntry: [
+    {
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      groupId: req.body.groupId,
+      attending: req.body.attending,
+      over21: req.body.over21,
+      drinking: req.body.drinking,
+      plusOneId: req.body.plusOneId,
+      plusOneAllowed: req.body.plusOneAllowed,
+      diet: req.body.diet,
+    },
+  ];
+
+  Guest.bulkCreate(req.body.guestEntry)
+    .then((guest) => {
+      res.status(200).json(guest);
+    })
+    .catch((err) => res.status(500).json({ error: err }));
+});
 
 router.get('/master/', validateSession, function (req, res) {
-  Guest.findAll()
+  Guest.findAll({ include: 'group' })
     .then((guest) => res.status(200).json(guest))
     .catch((err) => res.status(500).json({ error: err }));
 });
@@ -78,14 +99,15 @@ router.get('/master/:id', validateSession, function (req, res) {
 });
 
 router.delete('/master/:id', validateSession, function (req, res) {
-  if (req.user.role === "admin") {
+  if (req.user.role === 'admin') {
     Guest.destroy({
       where: { id: req.params.id },
     })
       .then((guest) => res.status(200).json(guest))
       .catch((err) => res.status(500).json({ error: err }));
-  } else { res.status(500).json({ error: "Must be an admin to delete guests" })
-}
+  } else {
+    res.status(500).json({ error: 'Must be an admin to delete guests' });
+  }
 });
 
 router.post('/', function (req, res) {
