@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { Guest, Group } = require('../models/');
+const { Guest, Group, PlusOne } = require('../models/');
 const validateSession = require('../middleware/validate-session');
 const router = Router();
 
@@ -61,7 +61,10 @@ router.post('/master/many/', validateSession, function (req, res) {
 });
 
 router.get('/master/', validateSession, function (req, res) {
-  Guest.findAll({ include: 'group' })
+  Guest.findAll({
+    include: ['group', 'plusone'],
+    order: [['updatedAt', 'DESC']],
+  })
     .then((guest) => res.status(200).json(guest))
     .catch((err) => res.status(500).json({ error: err }));
 });
@@ -92,7 +95,7 @@ router.put('/master/:id', validateSession, function (req, res) {
 router.get('/master/:id', validateSession, function (req, res) {
   Guest.findOne({
     where: { id: req.params.id },
-    include: 'group',
+    include: ['group', PlusOne],
   })
     .then((guest) => res.status(200).json(guest))
     .catch((err) => res.status(500).json({ error: err }));
@@ -167,47 +170,17 @@ router.put('/:id', function (req, res) {
   };
 
   Guest.update(guestEntry, query)
-    .then((guest) => {
-      res.status(200).json(guest);
-    })
+    .then((guest) => res.status(200).json(guest))
     .catch((err) => res.status(500).json({ error: err }));
 });
 
 router.get('/:id', function (req, res) {
   Guest.findOne({
     where: { id: req.params.id },
-    include: 'group',
+    include: ['group', PlusOne],
   })
-    .then((guest) => {
-      const guestEntry = {
-        firstName: guest.firstName,
-        lastName: guest.lastName,
-        attending: guest.attending,
-        over21: guest.over21,
-        drinking: guest.drinking,
-        plusOneId: guest.plusOneId,
-        diet: guest.diet,
-      };
+    .then((guestEntry) => {
       return res.status(200).json(guestEntry);
-    })
-    .catch((err) => res.status(500).json({ error: err }));
-});
-
-router.delete('/:id', function (req, res) {
-  Guest.findOne({
-    where: { id: req.params.id },
-  })
-    .then((guest) => {
-      if (guest.plusOneId)
-        Guest.destroy({
-          where: { id: guest.id },
-        })
-          .then((guest) => res.status(200).json(guest))
-          .catch((err) => res.status(500).json({ error: err }));
-      else
-        res
-          .status(500)
-          .json({ error: 'Must be logged in to delete a non-plus one' });
     })
     .catch((err) => res.status(500).json({ error: err }));
 });

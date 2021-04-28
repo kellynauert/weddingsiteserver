@@ -1,5 +1,5 @@
 const { Router } = require('express');
-const { Group } = require('../models/');
+const { Group, PlusOne, Guest } = require('../models/');
 const validateSession = require('../middleware/validate-session');
 const router = Router();
 
@@ -16,6 +16,19 @@ router.post('/', validateSession, function (req, res) {
     })
     .catch((err) => res.status(500).json({ error: err }));
 });
+
+router.get('/names', function (req, res) {
+  Group.findAll({
+    attributes: { exclude: ['address', 'phone', 'createdAt', 'updatedAt'] },
+  })
+    .then((groups) => {
+      let dict = {};
+      groups.forEach((item) => (dict[item.id] = item.groupName));
+      res.status(200).json(dict);
+    })
+    .catch((err) => res.status(500).json({ error: err }));
+});
+
 router.post('/many', validateSession, function (req, res) {
   groupEntry: [
     {
@@ -33,13 +46,14 @@ router.post('/many', validateSession, function (req, res) {
 });
 router.put('/:id', function (req, res) {
   const groupEntry = {
-    id: req.params.id,
     groupName: req.body.groupName,
     address: req.body.address,
     phone: req.body.phone,
   };
-
-  Group.update(groupEntry)
+  const query = {
+    where: { id: req.params.id },
+  };
+  Group.update(groupEntry, query)
     .then((group) => {
       res.status(200).json(group);
     })
@@ -59,10 +73,11 @@ module.exports = router;
 
 router.get('/', function (req, res) {
   const query = {
-    include: 'guests',
+    include: { model: Guest, include: PlusOne },
   };
   Group.findAll(query)
     .then((group) => res.status(200).json(group))
     .catch((err) => res.status(500).json({ error: err }));
 });
+
 module.exports = router;

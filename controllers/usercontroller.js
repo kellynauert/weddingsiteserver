@@ -23,7 +23,7 @@ router.post('/create', function (req, res) {
       );
       res.json({
         user: user,
-        message: 'User Created',
+        message: 'User Successfully Logged in!',
         sessionToken: token,
       });
     })
@@ -49,7 +49,7 @@ router.post('/login', function (req, res) {
                 { id: user.id, username: user.username },
                 process.env.JWT_SECRET,
                 {
-                  expiresIn: 60 * 60 * 24,
+                  expiresIn: 60 * 60 * 72,
                 }
               );
               res.status(200).json({

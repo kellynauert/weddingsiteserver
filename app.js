@@ -13,6 +13,7 @@ app.use(Express.json());
 app.use('/user', controllers.User);
 app.use('/guest', controllers.Guest);
 app.use('/group', controllers.Group);
+app.use('/plusone', controllers.PlusOne);
 
 db.authenticate()
   .then(() =>
