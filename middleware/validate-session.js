@@ -5,7 +5,9 @@ const validateSession = (req, res, next) => {
   const token = req.headers.authorization;
 
   if (!token) {
-    return res.status(403).send({ auth: false, message: 'No Token Provided' });
+    return res
+      .status(403)
+      .send({ auth: false, statusText: 'No Token Provided' });
   } else {
     jwt.verify(token, process.env.JWT_SECRET, (err, decodeToken) => {
       if (!err && decodeToken) {
@@ -22,11 +24,9 @@ const validateSession = (req, res, next) => {
           .catch((err) => next(err));
       } else {
         req.errors = err;
-        return res.status(500).json({ message: 'Not Authorized' });
+        return res.status(500).json({ statusText: 'Not Authorized' });
       }
     });
   }
 };
 module.exports = validateSession;
-
-const valSess2 = (req, res, authCallback, unAuthCallback) => {};
