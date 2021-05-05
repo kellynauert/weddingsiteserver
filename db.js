@@ -7,22 +7,22 @@ const { Sequelize } = require('sequelize');
 
 const sequelize = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false, // very important
-    },
-  },
+  // dialectOptions: {
+  //   ssl: {
+  //     require: true,
+  //     rejectUnauthorized: false, // very important
+  //   },
+  // },
 });
 
 // Comment out line 10 to run locally
-sequelize.authenticate().then(
-  function () {
-    console.log('Connected to Wedding Site postgres database');
-  },
-  function (err) {
-    console.log(err);
-  }
-);
+// sequelize.authenticate().then(
+//   function () {
+//     console.log('Connected to Wedding Site postgres database');
+//   },
+//   function (err) {
+//     console.log(err);
+//   }
+// );
 
 module.exports = db;
