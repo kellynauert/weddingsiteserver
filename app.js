@@ -23,8 +23,8 @@ db.authenticate()
       ()
   )
   .then(() =>
-    app.listen(3000, () => {
-      console.log(`[server]: App is listening on localhost:3000`);
+    app.listen(process.env.PORT, () => {
+      console.log(`[server]: App is listening on ${process.env.PORT}`);
     })
   )
   .catch((e) => {
