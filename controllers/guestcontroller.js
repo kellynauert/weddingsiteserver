@@ -2,6 +2,7 @@ const { Router } = require('express');
 const { Guest, Group, PlusOne } = require('../models/');
 const validateSession = require('../middleware/validate-session');
 const router = Router();
+const { Op } = require('sequelize');
 
 router.post('/master/', validateSession, function (req, res) {
   const guestEntry = {
@@ -67,6 +68,66 @@ router.get('/master/', validateSession, function (req, res) {
   })
     .then((guest) => res.status(200).json(guest))
     .catch((err) => res.status(500).json({ error: err }));
+});
+router.get('/master/count', function (req, res) {
+  query = {
+    attending: 0,
+    invited: 0,
+    plusOnes: 0,
+    drinking: 0,
+    vegetarian: 0,
+    pescatarian: 0,
+    both: 0,
+  };
+  Guest.count({
+    col: 'attending',
+    where: { attending: 'true' },
+  })
+    .then((attendees) => (query.attending = attendees))
+    .then(
+      Guest.count({
+        col: 'firstName',
+      }).then((names) => (query.invited = names))
+    )
+    .then(
+      PlusOne.count({
+        col: 'firstName',
+      }).then((names) => (query.plusOnes = names))
+    )
+    .then(
+      Group.count({
+        col: 'address',
+      }).then((addresses) => (query.invites = addresses))
+    )
+    .then(
+      Guest.count({
+        col: 'drinking',
+        where: { drinking: 'true' },
+      }).then((drinkers) => (query.drinking = drinkers))
+    )
+    .then(
+      Guest.count({
+        where: {
+          diet: { [Op.contains]: ['Vegetarian'] },
+        },
+      }).then((vegetarians) => (query.vegetarian = vegetarians))
+    )
+    .then(
+      Guest.count({
+        where: {
+          diet: { [Op.contains]: ['Pescatarian'] },
+        },
+      }).then((vegetarians) => (query.pescatarian = vegetarians))
+    )
+    .then(
+      Guest.count({
+        where: {
+          diet: { [Op.contains]: ['Pescatarian', 'Vegetarian'] },
+        },
+      })
+        .then((vegetarians) => (query.both = vegetarians))
+        .then(() => res.status(200).json(query))
+    );
 });
 
 router.put('/master/:id', validateSession, function (req, res) {

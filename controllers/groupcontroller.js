@@ -32,6 +32,7 @@ router.get('/names', function (req, res) {
 router.post('/many', validateSession, function (req, res) {
   groupEntry: [
     {
+      id: req.body.id,
       groupName: req.body.groupName,
       address: req.body.address,
       phone: req.body.phone,
