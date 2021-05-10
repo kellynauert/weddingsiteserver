@@ -72,6 +72,7 @@ router.get('/master/', validateSession, function (req, res) {
 router.get('/master/count', function (req, res) {
   query = {
     attending: 0,
+    notAttending: 0,
     invited: 0,
     plusOnes: 0,
     drinking: 0,
@@ -81,9 +82,15 @@ router.get('/master/count', function (req, res) {
   };
   Guest.count({
     col: 'attending',
-    where: { attending: 'true' },
+    where: { attending: false },
   })
-    .then((attendees) => (query.attending = attendees))
+    .then((noResponse) => (query.notAttending = noResponse))
+    .then(
+      Guest.count({
+        col: 'attending',
+        where: { attending: true },
+      }).then((attendees) => (query.attending = attendees))
+    )
     .then(
       Guest.count({
         col: 'firstName',
@@ -126,6 +133,7 @@ router.get('/master/count', function (req, res) {
         },
       })
         .then((vegetarians) => (query.both = vegetarians))
+
         .then(() => res.status(200).json(query))
     );
 });
