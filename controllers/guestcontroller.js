@@ -16,27 +16,31 @@ router.post('/master/', validateSession, function (req, res) {
     plusOneAllowed: req.body.plusOneAllowed,
     diet: req.body.diet,
   };
-  if (!req.body.groupId) {
-    const groupName = req.body.groupName
-      ? req.body.groupName
-      : req.body.firstName + req.body.lastName;
-    const groupEntry = {
-      groupName,
-    };
+  if (req.user.role === 'Admin') {
+    if (!req.body.groupId) {
+      const groupName = req.body.groupName
+        ? req.body.groupName
+        : req.body.firstName + req.body.lastName;
+      const groupEntry = {
+        groupName,
+      };
 
-    Group.create(groupEntry).then((group) => {
-      Guest.create({ ...guestEntry, groupId: group.id })
+      Group.create(groupEntry).then((group) => {
+        Guest.create({ ...guestEntry, groupId: group.id })
+          .then((guest) => {
+            res.status(200).json(guest);
+          })
+          .catch((err) => res.status(500).json({ error: err }));
+      });
+    } else {
+      Guest.create(guestEntry)
         .then((guest) => {
           res.status(200).json(guest);
         })
         .catch((err) => res.status(500).json({ error: err }));
-    });
+    }
   } else {
-    Guest.create(guestEntry)
-      .then((guest) => {
-        res.status(200).json(guest);
-      })
-      .catch((err) => res.status(500).json({ error: err }));
+    res.status(500).json({ error: 'Must be an admin to delete guests' });
   }
 });
 router.post('/master/many/', validateSession, function (req, res) {
@@ -80,62 +84,52 @@ router.get('/master/count', function (req, res) {
     pescatarian: 0,
     both: 0,
   };
-  Guest.count({
-    col: 'attending',
-    where: { attending: false },
-  })
-    .then((noResponse) => (query.notAttending = noResponse))
-    .then(
-      Guest.count({
-        col: 'attending',
-        where: { attending: true },
-      }).then((attendees) => (query.attending = attendees))
-    )
-    .then(
-      Guest.count({
-        col: 'firstName',
-      }).then((names) => (query.invited = names))
-    )
-    .then(
-      PlusOne.count({
-        col: 'firstName',
-      }).then((names) => (query.plusOnes = names))
-    )
-    .then(
-      Group.count({
-        col: 'address',
-      }).then((addresses) => (query.invites = addresses))
-    )
-    .then(
-      Guest.count({
-        col: 'drinking',
-        where: { drinking: 'true' },
-      }).then((drinkers) => (query.drinking = drinkers))
-    )
-    .then(
-      Guest.count({
-        where: {
-          diet: { [Op.contains]: ['Vegetarian'] },
-        },
-      }).then((vegetarians) => (query.vegetarian = vegetarians))
-    )
-    .then(
-      Guest.count({
-        where: {
-          diet: { [Op.contains]: ['Pescatarian'] },
-        },
-      }).then((vegetarians) => (query.pescatarian = vegetarians))
-    )
-    .then(
-      Guest.count({
-        where: {
-          diet: { [Op.contains]: ['Pescatarian', 'Vegetarian'] },
-        },
-      })
-        .then((vegetarians) => (query.both = vegetarians))
+  Promise.all([
+    Guest.count({
+      col: 'attending',
+      where: { attending: false },
+    }).then((noResponse) => (query.notAttending = noResponse)),
 
-        .then(() => res.status(200).json(query))
-    );
+    Guest.count({
+      col: 'attending',
+      where: { attending: true },
+    }).then((attendees) => (query.attending = attendees)),
+
+    Guest.count({
+      col: 'firstName',
+    }).then((names) => (query.invited = names)),
+
+    PlusOne.count({
+      col: 'firstName',
+    }).then((names) => (query.plusOnes = names)),
+
+    Group.count({
+      col: 'address',
+    }).then((addresses) => (query.invites = addresses)),
+
+    Guest.count({
+      col: 'drinking',
+      where: { drinking: 'true' },
+    }).then((drinkers) => (query.drinking = drinkers)),
+
+    Guest.count({
+      where: {
+        diet: { [Op.contains]: ['Vegetarian'] },
+      },
+    }).then((vegetarians) => (query.vegetarian = vegetarians)),
+
+    Guest.count({
+      where: {
+        diet: { [Op.contains]: ['Pescatarian'] },
+      },
+    }).then((vegetarians) => (query.pescatarian = vegetarians)),
+
+    Guest.count({
+      where: {
+        diet: { [Op.contains]: ['Pescatarian', 'Vegetarian'] },
+      },
+    }).then((vegetarians) => (query.both = vegetarians)),
+  ]).then(() => res.status(200).json(query));
 });
 
 router.put('/master/:id', validateSession, function (req, res) {
@@ -171,7 +165,7 @@ router.get('/master/:id', validateSession, function (req, res) {
 });
 
 router.delete('/master/:id', validateSession, function (req, res) {
-  if (req.user.role === 'admin') {
+  if (req.user.role === 'Admin') {
     Guest.destroy({
       where: { id: req.params.id },
     })

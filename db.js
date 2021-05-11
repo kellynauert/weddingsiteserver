@@ -1,10 +1,5 @@
 const { Sequelize } = require('sequelize');
 
-// const db = new Sequelize("weddingsite", "postgres", "password", {
-//   host: "localhost",
-//   dialect: "postgres",
-// });
-
 const db = new Sequelize(process.env.DATABASE_URL, {
   dialect: 'postgres',
   operatorsAliases: Sequelize.Op.Aliases,
@@ -16,14 +11,6 @@ const db = new Sequelize(process.env.DATABASE_URL, {
   },
 });
 
-// Comment out line 10 to run locally
-// sequelize.authenticate().then(
-//   function () {
-//     console.log('Connected to Wedding Site postgres database');
-//   },
-//   function (err) {
-//     console.log(err);
-//   }
-// );
+// Comment out lines 6-11 to run locally
 
 module.exports = db;

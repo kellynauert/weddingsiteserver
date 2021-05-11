@@ -60,7 +60,17 @@ router.put('/:id', function (req, res) {
     })
     .catch((err) => res.status(500).json({ error: err }));
 });
-
+router.delete('/:id', validateSession, function (req, res) {
+  if (req.user.role === 'Admin') {
+    Group.destroy({
+      where: { id: req.params.id },
+    })
+      .then((guest) => res.status(200).json(guest))
+      .catch((err) => res.status(500).json({ error: err }));
+  } else {
+    res.status(500).json({ error: 'Must be an admin to delete guests' });
+  }
+});
 router.get('/:id', function (req, res) {
   const query = {
     where: { id: req.params.id },
@@ -75,6 +85,7 @@ module.exports = router;
 router.get('/', function (req, res) {
   const query = {
     include: { model: Guest, include: PlusOne },
+    order: [['updatedAt', 'DESC']],
   };
   Group.findAll(query)
     .then((group) => res.status(200).json(group))
