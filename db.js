@@ -10,7 +10,6 @@ const db = new Sequelize(process.env.DATABASE_URL, {
     },
   },
 });
-
 // Comment out lines 6-11 to run locally
 
 module.exports = db;
