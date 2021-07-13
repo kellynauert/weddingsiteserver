@@ -1,5 +1,6 @@
 module.exports = {
   User: require('./usercontroller'),
-  Student: require('./studentcontroller'),
-  School: require('./schoolcontroller'),
+  Guest: require('./guestcontroller'),
+  Group: require('./groupcontroller'),
+  PlusOne: require('./plusonecontroller'),
 };

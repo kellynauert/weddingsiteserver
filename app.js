@@ -8,16 +8,19 @@ app.use(require('./middleware/cors'));
 
 const controllers = require('./controllers');
 
-app.use(Express.json({ limit: '50mb' }));
+app.use(Express.json());
 
 app.use('/user', controllers.User);
-app.use('/student', controllers.Student);
-app.use('/school', controllers.School);
+app.use('/guest', controllers.Guest);
+app.use('/group', controllers.Group);
+app.use('/plusone', controllers.PlusOne);
 
 db.authenticate()
-  .then(
-    // () => db.sync({ force: true })
-    () => db.sync()
+  .then(() =>
+    db
+      .sync
+      // { force: true }
+      ()
   )
   .then(() =>
     app.listen(process.env.PORT, () => {

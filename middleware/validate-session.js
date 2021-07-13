@@ -1,12 +1,32 @@
-const { Router } = require('express');
+const jwt = require('jsonwebtoken');
 const { User } = require('../models');
-const router = Router();
 
 const validateSession = (req, res, next) => {
-  router.use(async (req, res, next) => {
-    const user = await User.findFirst({ where: { id: req.session.userId } });
-    req.user = user;
-    next();
-  });
+  const token = req.headers.authorization;
+
+  if (!token) {
+    return res
+      .status(403)
+      .send({ auth: false, statusText: 'No Token Provided' });
+  } else {
+    jwt.verify(token, process.env.JWT_SECRET, (err, decodeToken) => {
+      if (!err && decodeToken) {
+        User.findOne({
+          where: {
+            id: decodeToken.id,
+          },
+        })
+          .then((user) => {
+            if (!user) throw err;
+            req.user = user;
+            return next();
+          })
+          .catch((err) => next(err));
+      } else {
+        req.errors = err;
+        return res.status(500).json({ statusText: 'Not Authorized' });
+      }
+    });
+  }
 };
 module.exports = validateSession;

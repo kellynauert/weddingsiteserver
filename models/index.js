@@ -1,12 +1,16 @@
 const User = require('./user');
-const Student = require('./student');
-const School = require('./school');
-
-Student.belongsTo(School, { through: 'schoolId' });
-// School.belongsToMany(Student, { through: 'stateId' });
+const Guest = require('./guest');
+const Group = require('./group');
+const PlusOne = require('./plusone');
+// Setup Associations
+Guest.belongsTo(Group);
+Group.hasMany(Guest);
+PlusOne.belongsTo(Guest);
+Guest.hasOne(PlusOne);
 
 module.exports = {
   User,
-  Student,
-  School,
+  Guest,
+  Group,
+  PlusOne,
 };
