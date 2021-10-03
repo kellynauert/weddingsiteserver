@@ -81,7 +81,7 @@ router.get('/master/count', function (req, res) {
     plusOnes: 0,
     drinking: 0,
     vegetarian: 0,
-    pescatarian: 0,
+    meat: 0,
     both: 0,
   };
   Promise.all([
@@ -120,15 +120,9 @@ router.get('/master/count', function (req, res) {
 
     Guest.count({
       where: {
-        diet: { [Op.contains]: ['Pescatarian'] },
+        diet: { [Op.contains]: ['Meat'] },
       },
-    }).then((vegetarians) => (query.pescatarian = vegetarians)),
-
-    Guest.count({
-      where: {
-        diet: { [Op.contains]: ['Pescatarian', 'Vegetarian'] },
-      },
-    }).then((vegetarians) => (query.both = vegetarians)),
+    }).then((meateaters) => (query.meat = meateaters)),
   ]).then(() => res.status(200).json(query));
 });
 
