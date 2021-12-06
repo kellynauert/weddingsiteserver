@@ -4,13 +4,7 @@ const validateSession = require('../middleware/validate-session');
 const router = Router();
 
 router.post('/', validateSession, function (req, res) {
-  const groupEntry = {
-    groupName: req.body.groupName,
-    address: req.body.address,
-    phone: req.body.phone,
-  };
-
-  Group.create(groupEntry)
+  Group.create(req.body)
     .then((group) => {
       res.status(200).json(group);
     })
@@ -19,7 +13,7 @@ router.post('/', validateSession, function (req, res) {
 
 router.get('/names', function (req, res) {
   Group.findAll({
-    attributes: { exclude: ['address', 'phone', 'createdAt', 'updatedAt'] },
+    attributes: { exclude: ['createdAt', 'updatedAt'] },
   })
     .then((groups) => {
       let dict = {};
@@ -30,31 +24,18 @@ router.get('/names', function (req, res) {
 });
 
 router.post('/many', validateSession, function (req, res) {
-  groupEntry: [
-    {
-      id: req.body.id,
-      groupName: req.body.groupName,
-      address: req.body.address,
-      phone: req.body.phone,
-    },
-  ];
-
-  Group.bulkCreate(req.body.groupEntry)
+  Group.bulkCreate(req.body)
     .then((group) => {
       res.status(200).json(group);
     })
     .catch((err) => res.status(500).json({ error: err }));
 });
+
 router.put('/:id', function (req, res) {
-  const groupEntry = {
-    groupName: req.body.groupName,
-    address: req.body.address,
-    phone: req.body.phone,
-  };
   const query = {
     where: { id: req.params.id },
   };
-  Group.update(groupEntry, query)
+  Group.update(req.body, query)
     .then((group) => {
       res.status(200).json(group);
     })

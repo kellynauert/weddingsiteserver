@@ -3,15 +3,14 @@ const { PlusOne, Guest } = require('../models/');
 const router = Router();
 
 router.post('/', function (req, res) {
-  const guestEntry = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    attending: true,
-    drinking: req.body.drinking,
-    diet: req.body.diet,
-    guestId: req.body.guestId,
-  };
-  PlusOne.create(guestEntry)
+  PlusOne.create(req.body)
+    .then((guest) => {
+      res.status(200).json(guest);
+    })
+    .catch((err) => res.status(500).json({ error: err }));
+});
+router.get('/:id', function (req, res) {
+  PlusOne.findOne({ where: { id: req.params.id } })
     .then((guest) => {
       res.status(200).json(guest);
     })
@@ -37,17 +36,9 @@ router.delete('/:id', function (req, res) {
 });
 
 router.put('/:id', function (req, res) {
-  const query = {
+  PlusOne.update(req.body.guest, {
     where: { id: req.params.id },
-  };
-  const guestEntry = {
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    drinking: req.body.drinking,
-    diet: req.body.diet,
-  };
-
-  PlusOne.update(guestEntry, query)
+  })
     .then((guest) => {
       res.status(200).json(guest);
     })

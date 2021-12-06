@@ -10,16 +10,28 @@ const plusone = db.define('plusone', {
     type: DataTypes.STRING,
     allowNull: true,
   },
-  attending: {
-    type: DataTypes.BOOLEAN,
-    allowNull: true,
-  },
   drinking: {
     type: DataTypes.BOOLEAN,
     allowNull: true,
   },
-  diet: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
+  vegetarian: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  },
+  beer: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  },
+  wine: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  },
+  cider: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  },
+  mead: {
+    type: DataTypes.BOOLEAN,
     allowNull: true,
   },
 });

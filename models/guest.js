@@ -26,12 +26,24 @@ const guest = db.define('guest', {
     type: DataTypes.BOOLEAN,
     allowNull: true,
   },
-  diet: {
-    type: DataTypes.ARRAY(DataTypes.STRING),
+  vegetarian: {
+    type: DataTypes.BOOLEAN,
     allowNull: true,
   },
-  plusOneId: {
-    type: DataTypes.INTEGER,
+  beer: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  },
+  wine: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  },
+  cider: {
+    type: DataTypes.BOOLEAN,
+    allowNull: true,
+  },
+  mead: {
+    type: DataTypes.BOOLEAN,
     allowNull: true,
   },
   plusOneAllowed: {
