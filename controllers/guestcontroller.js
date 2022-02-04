@@ -230,7 +230,7 @@ router.delete('/master/:id', validateSession, function (req, res) {
 });
 
 router.put('/:id', function (req, res) {
-  Guest.update(req.body, {
+  Guest.update(req.body.guest, {
     where: { id: req.params.id },
     returning: true,
   })
