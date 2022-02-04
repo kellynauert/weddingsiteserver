@@ -5,5 +5,10 @@
     "database": "weddingsite",
     "host": "127.0.0.1",
     "dialect": "postgres"
-  }
+  },
+  "root": "build/",
+  "routes": {
+    "/**": "index.html"
+  },
+  "https_only": true
 }
