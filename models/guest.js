@@ -42,10 +42,7 @@ const guest = db.define('guest', {
     type: DataTypes.BOOLEAN,
     allowNull: true,
   },
-  mead: {
-    type: DataTypes.BOOLEAN,
-    allowNull: true,
-  },
+
   plusOneAllowed: {
     type: DataTypes.BOOLEAN,
     allowNull: true,

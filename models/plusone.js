@@ -30,9 +30,5 @@ const plusone = db.define('plusone', {
     type: DataTypes.BOOLEAN,
     allowNull: true,
   },
-  mead: {
-    type: DataTypes.BOOLEAN,
-    allowNull: true,
-  },
 });
 module.exports = plusone;

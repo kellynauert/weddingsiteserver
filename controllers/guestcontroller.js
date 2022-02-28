@@ -73,11 +73,9 @@ router.get('/master/count', function (req, res) {
     drinking: 0,
     vegetarian: 0,
     plusOnesVegetarian: 0,
-    mead: 0,
     wine: 0,
     beer: 0,
     cider: 0,
-    pomead: 0,
     powine: 0,
     pobeer: 0,
     pocider: 0,
@@ -134,13 +132,6 @@ router.get('/master/count', function (req, res) {
 
     Guest.count({
       where: {
-        mead: true,
-        attending: true,
-      },
-    }).then((mead) => (query.mead = mead)),
-
-    Guest.count({
-      where: {
         beer: true,
         attending: true,
       },
@@ -159,12 +150,6 @@ router.get('/master/count', function (req, res) {
         attending: true,
       },
     }).then((cider) => (query.cider = cider)),
-
-    PlusOne.count({
-      where: {
-        mead: true,
-      },
-    }).then((mead) => (query.pomead = mead)),
 
     PlusOne.count({
       where: {
